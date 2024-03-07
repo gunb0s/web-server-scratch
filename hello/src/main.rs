@@ -33,5 +33,21 @@ fn handle_connection(mut stream: TcpStream) {
 
         stream.write(response.as_bytes()).unwrap();
         stream.flush().unwrap();
+    } else {
+        let status_line = "HTTP/1.1 400 NOT FOUND";
+        let mut file = File::open("404.html").unwrap();
+        let mut contents = String::new();
+
+        file.read_to_string(&mut contents).unwrap();
+
+        let response = format!(
+            "{}\r\nContent-Length: {}\r\n\r\n{}",
+            status_line,
+            contents.len(),
+            contents
+        );
+
+        stream.write(response.as_bytes()).unwrap();
+        stream.flush().unwrap();
     }
 }
