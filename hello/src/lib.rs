@@ -6,7 +6,17 @@ pub struct ThreadPool {
     sender: mpsc::Sender<Job>
 }
 
-type Job = Box<dyn FnOnce() + Send + 'static>;
+trait FnBox {
+    fn call_box(self: Box<Self>);
+}
+
+impl<F: FnOnce()> FnBox for F {
+    fn call_box(self: Box<F>) {
+        (*self)()
+    }
+}
+
+type Job = Box<dyn FnBox + Send + 'static>;
 
 impl ThreadPool {
     /// 새 스레드풀 생성
@@ -59,7 +69,7 @@ impl Worker {
 
                 println!("Worker {} got a job; executing.", id);
 
-                (*job)();
+                job.call_box();
             }
         });
 
