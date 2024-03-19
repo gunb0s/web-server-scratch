@@ -8,6 +8,7 @@ class UserManager {
             println("User with id ${user.id} already exists.")
             return false
         }
+        
         users.add(user)
         println("User added successfully.")
         return true
